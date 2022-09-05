@@ -1,0 +1,91 @@
+body {
+  background-color: #F8F9FA;
+}
+
+h1 {
+  font-size: 1.2rem;
+  font-weight: normal;
+  text-align: center;
+  background-color: #fff;
+  padding: 20px 0;
+  margin-bottom: 0;
+}
+
+.btn-primary {
+  background: #60C2FF;
+  color: #fff;
+  border-color: #60C2FF;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary:active:focus,
+.btn-primary:active:hover,
+.btn-primary:active.focus,
+.btn-primary.active,
+.btn-primary.active:focus,
+.btn-primary.active:hover,
+.btn-primary.active.focus,
+.open>.dropdown-toggle.btn-primary,
+.open>.dropdown-toggle.btn-primary:hover,
+.open>.dropdown-toggle.btn-primary:focus,
+.open>.dropdown-toggle.btn-primary.focus,
+.btn-primary.disabled:hover,
+.btn-primary[disabled]:hover,
+fieldset[disabled] .btn-primary:hover,
+.btn-primary.disabled:focus,
+.btn-primary[disabled]:focus,
+fieldset[disabled] .btn-primary:focus,
+.btn-primary.disabled.focus,
+.btn-primary[disabled].focus,
+fieldset[disabled] .btn-primary.focus {
+  background: #42A7E5;
+  color: #E0E0E0;
+  border-color: #60C2FF;
+}
+
+/* .btn-primary.outline {
+  border: 3px solid #60C2FF;
+  color: red;
+} */
+
+header {
+  text-align: center;
+  background-color: #000;
+  color: #fff;
+  padding: 10px;
+}
+
+.form-label {
+  font-size: 0.9rem;
+}
+
+.btn {
+  padding: 10px;
+}
+
+.table {
+  background-color: #fff;
+}
+
+.card {
+  border: none;
+}
+
+.card-title {
+  font-size: 1rem;
+  padding-bottom: 20px;
+}
+
+.conmplete-icon {
+  font-size: 3rem;
+  color: #61B975;
+}
+.navbar-brand {
+  font-size: 1rem;
+}
+
+.nav-icon {
+  font-size: 1.3rem;
+}
