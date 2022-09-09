@@ -1,0 +1,3 @@
+docker/*
+.devcontainer/*
+src/.vscode/*
