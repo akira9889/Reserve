@@ -1,4 +1,5 @@
 <?php
+$err = array();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     //POSTパラメータから各種入力値を受け取る
@@ -10,18 +11,64 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $tel = $_POST['tel'];
     $comment = $_POST['comment'];
 
-    //各種入力値をセッション変数に保存する
-    $_SESSION['RESERVE']['reserve_date'] = $reserve_date;
-    $_SESSION['RESERVE']['reserve_num'] = $reserve_num;
-    $_SESSION['RESERVE']['reserve_time'] = $reserve_time;
-    $_SESSION['RESERVE']['name'] = $name;
-    $_SESSION['RESERVE']['email'] = $email;
-    $_SESSION['RESERVE']['tel'] = $tel;
-    $_SESSION['RESERVE']['comment'] = $comment;
+    //各種入力値のバリデーション
+    if (!$reserve_date) {
+        $err['reserve_date'] = '予約日を入力してください';
+    }
+    //TODO:予約日はプルダウン設定値を決定後にバリデーション実装
 
-    //予約確認画面へ遷移
-    header('Location: confirm.php');
-    exit;
+    if (!$reserve_num) {
+        $err['reserve_num'] = '人数を入力してください';
+    } elseif (!preg_match('/^[0-9]+$/', $reserve_num)) {
+        $err['reserve_num'] = '人数を正しく入力してください';
+    }
+
+    if (!$reserve_time) {
+        $err['reserve_time'] = '予約時間を入力してください';
+    }
+    //TODO:予約時間はプルダウン設定値を決定後にバリデーション実装
+
+    if (!$name) {
+        $err['name'] = '氏名を入力してください';
+    } elseif (mb_strlen($name, 'utf-8') > 20) {
+        $err['name'] = '名前は20文字以内で入力してください';
+    }
+
+    if (!$email) {
+        $err['email'] = 'メールアドレスを入力してください';
+    } elseif (mb_strlen($email, 'utf-8') > 100) {
+        $err['email'] = 'メールアドレスは100文字以内で入力してください';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $err['email'] = 'メールアドレスが不正です';
+    }
+
+    if (!$tel) {
+        $err['tel'] = '電話番号を入力してください';
+    } elseif (mb_strlen($tel, 'utf-8') > 20) {
+        $err['tel'] = '電話番号は20文字以内で入力してください';
+    } elseif (!preg_match('/^[0-9]{2,4}-[0-9]{2,4}-[0-9]{3,4}$/', $tel)) {
+        $err['tel'] = '電話番号を正しく入力してください';
+    }
+
+    if (mb_strlen($comment, 'utf-8') > 2000) {
+        $err['comment'] = '備考欄は2000文字以内で入力してください';
+    }
+
+    //エラーがなければ次の処理に進む
+    if (empty($err)) {
+        //各種入力値をセッション変数に保存する
+        $_SESSION['RESERVE']['reserve_date'] = $reserve_date;
+        $_SESSION['RESERVE']['reserve_num'] = $reserve_num;
+        $_SESSION['RESERVE']['reserve_time'] = $reserve_time;
+        $_SESSION['RESERVE']['name'] = $name;
+        $_SESSION['RESERVE']['email'] = $email;
+        $_SESSION['RESERVE']['tel'] = $tel;
+        $_SESSION['RESERVE']['comment'] = $comment;
+
+        //予約確認画面へ遷移
+        header('Location: confirm.php');
+        exit;
+    }
 }
 ?>
 <!doctype html>
@@ -47,44 +94,51 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <form class="m-3" method="post">
         <div class="mb-3">
             <label for="exampleFormControlInput1" class="form-label">【1】予約日を選択</label>
-            <select class="form-select" name="reserve_date">
+            <select class="form-select <?php if (isset($err['reserve_date'])) echo 'is-invalid' ?>" name="reserve_date">
                 <option selected>日付</option>
                 <option value="6/1">6/1</option>
                 <option value="6/2">6/2</option>
                 <option value="6/3">6/3</option>
             </select>
+            <div class="invalid-feedback"><?= $err['reserve_date'] ?></div>
         </div>
         <div class="mb-3">
             <label for="exampleFormControlInput1" class="form-label">【2】人数選択</label>
-            <select class="form-select" name="reserve_num">
+            <select class="form-select <?php if (isset($err['reserve_num'])) echo 'is-invalid' ?>" name="reserve_num">
                 <option selected>人数</option>
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
             </select>
+            <div class="invalid-feedback"><?= $err['reserve_num'] ?></div>
         </div>
         <div class="mb-3">
             <label for="exampleFormControlInput1" class="form-label">【3】予約時間を選択</label>
-            <select class="form-select" name="reserve_time">
+            <select class="form-select <?php if (isset($err['reserve_time'])) echo 'is-invalid' ?>" name="reserve_time">
                 <option selected>時間</option>
                 <option value="12:00">12:00</option>
                 <option value="13:00">13:00</option>
                 <option value="14:00">14:00</option>
             </select>
+            <div class="invalid-feedback"><?= $err['reserve_time'] ?></div>
         </div>
         <div class="mb-3">
             <label for="exampleFormControlInput1" class="form-label">【4】予約情報を入力</label>
-            <input type="text" class="form-control" name="name" placeholder="氏名">
+            <input type="text" class="form-control <?php if (isset($err['name'])) echo 'is-invalid' ?>" name="name" placeholder="氏名">
+            <div class="invalid-feedback"><?= $err['name'] ?></div>
         </div>
         <div class="mb-3">
-            <input type="email" class="form-control" name="email" placeholder="メールアドレス">
+            <input type="email" class="form-control <?php if (isset($err['email'])) echo 'is-invalid' ?>" name="email" placeholder="メールアドレス">
+            <div class="invalid-feedback"><?= $err['email'] ?></div>
         </div>
         <div class="mb-3">
-            <input type="tel" class="form-control" name="tel" placeholder="電話番号">
+            <input type="tel" class="form-control <?php if (isset($err['tel'])) echo 'is-invalid' ?>" name="tel" placeholder="電話番号">
+            <div class="invalid-feedback"><?= $err['tel'] ?></div>
         </div>
         <div class="mb-3">
             <label for="exampleFormControlTextarea1" class="form-label">【5】備考欄</label>
-            <textarea class="form-control" name="comment" rows="3" placeholder="備考欄"></textarea>
+            <textarea class="form-control <?php if (isset($err['comment'])) echo 'is-invalid' ?>" name="comment" rows="3" placeholder="備考欄"></textarea>
+            <div class="invalid-feedback"><?= $err['comment'] ?></div>
         </div>
 
         <div class="d-grid gap-2">
