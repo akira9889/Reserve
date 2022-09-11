@@ -1,3 +1,5 @@
 docker/*
 .devcontainer/*
 src/.vscode/*
+docker/db/*
+.vscode/*
