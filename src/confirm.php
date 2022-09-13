@@ -1,3 +1,7 @@
+<?php
+session_start();
+
+?>
 <!doctype html>
 <html lang="ja">
 
@@ -13,7 +17,7 @@
     <link href="/css/style.css" rel="stylesheet">
 
     <title>予約内容確認</title>
-</head> 
+</head>
 
 <body>
     <header>SAMPLE SHOP</header>
@@ -22,27 +26,27 @@
         <tbody>
             <tr>
                 <th scope="row">日時</th>
-                <td>2022年01月01日 (土) 17時00分</td>
+                <td><?= $_SESSION['RESERVE']['reserve_date'] ?> <?= $_SESSION['RESERVE']['reserve_time'] ?></td>
             </tr>
             <tr>
                 <th scope="row">人数</th>
-                <td>4名</td>
+                <td><?= $_SESSION['RESERVE']['reserve_num'] ?></td>
             </tr>
             <tr>
                 <th scope="row">氏名</th>
-                <td>XXXXX</td>
+                <td><?= $_SESSION['RESERVE']['name'] ?></td>
             </tr>
             <tr>
                 <th scope="row">メールアドレス</th>
-                <td>XXX@XXX.xxx</td>
+                <td><?= $_SESSION['RESERVE']['email'] ?></td>
             </tr>
             <tr>
                 <th scope="row">電話番号</th>
-                <td>111-111-111</td>
+                <td><?= $_SESSION['RESERVE']['tel'] ?></td>
             </tr>
             <tr>
                 <th scope="row">備考欄</th>
-                <td>XXXXXXXXXXXXXXXXXXX<br>XXXXXXXXXXXX</td>
+                <td><?= nl2br($_SESSION['RESERVE']['comment']) ?></td>
             </tr>
         </tbody>
     </table>
