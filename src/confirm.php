@@ -1,4 +1,6 @@
 <?php
+require_once 'functions.php';
+
 session_start();
 
 ?>
@@ -26,7 +28,7 @@ session_start();
         <tbody>
             <tr>
                 <th scope="row">日時</th>
-                <td><?= $_SESSION['RESERVE']['reserve_date'] ?> <?= $_SESSION['RESERVE']['reserve_time'] ?></td>
+                <td><?= date_format_dw($_SESSION['RESERVE']['reserve_date'])  ?> <?= $_SESSION['RESERVE']['reserve_time'] ?></td>
             </tr>
             <tr>
                 <th scope="row">人数</th>

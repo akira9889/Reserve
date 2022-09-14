@@ -17,3 +17,8 @@ function arrayToSelect($inputName, $srcArray, $selectedIndex = "")
     return $temphtml;
 
 }
+
+function date_format_dw (string $date) {
+    $yyyymmdd =  substr_replace(substr_replace($date, '-', -2, 0), '-', 4, 0);
+    return date('n/j', strtotime($yyyymmdd));
+}
