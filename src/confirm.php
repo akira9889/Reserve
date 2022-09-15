@@ -1,8 +1,38 @@
 <?php
+require_once 'config/config.php';
 require_once 'functions.php';
 
 session_start();
 
+$pdo = connect_db();
+
+$session_reserve = $_SESSION['RESERVE'];
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    //データベース接続
+
+    $reserve_date = substr_replace(substr_replace($session_reserve['reserve_date'], '-', -2, 0), '-', 4, 0);
+
+    // セッション情報をreserveテーブルにINSERT
+    $sql = "INSERT INTO reserve(reserve_date, reserve_time, reserve_num, name, email, tel, comment) VALUES(:reserve_date, :reserve_time, :reserve_num, :name, :email, :tel, :comment)";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue('reserve_date', $reserve_date, PDO::PARAM_STR);
+    $stmt->bindValue('reserve_time', $session_reserve['reserve_time'], PDO::PARAM_STR);
+    $stmt->bindValue('reserve_num', (int)$session_reserve['reserve_num'], PDO::PARAM_INT);
+    $stmt->bindValue('name', $session_reserve['name'], PDO::PARAM_STR);
+    $stmt->bindValue('email', $session_reserve['email'], PDO::PARAM_STR);
+    $stmt->bindValue('tel', $session_reserve['tel'], PDO::PARAM_STR);
+    $stmt->bindValue('comment', $session_reserve['comment'], PDO::PARAM_STR);
+    $stmt->execute();
+
+    //セッション情報を消去
+    $_SESSION = array();
+    session_destroy();
+    
+    // 予約完了画面へ遷移
+    header('Location: /complete.php');
+    exit;
+}
 ?>
 <!doctype html>
 <html lang="ja">
@@ -53,10 +83,12 @@ session_start();
         </tbody>
     </table>
 
-    <div class="d-grid gap-2  mx-3">
-        <a class="btn btn-primary rounded-pill" href="complete.php">予約確定</a>
-        <a class="btn btn-secondary  rounded-pill" href="/">戻る</a>
-    </div>
+    <form method="post">
+        <div class="d-grid gap-2  mx-3">
+            <button class="btn btn-primary rounded-pill">予約確定</button>
+            <a class="btn btn-secondary  rounded-pill" href="/">戻る</a>
+        </div>
+    </form>
 
     <!-- Optional JavaScript; choose one of the two! -->
 

@@ -22,3 +22,12 @@ function date_format_dw (string $date) {
     $yyyymmdd =  substr_replace(substr_replace($date, '-', -2, 0), '-', 4, 0);
     return date('n/j', strtotime($yyyymmdd));
 }
+
+function connect_db()
+{
+    $param = 'mysql:dbname=' . DB_NAME . ';host=' . DB_HOST . '';
+    $pdo = new PDO($param, DB_USER, DB_PASSWORD);
+    $pdo->query('SET NAMES utf8;');
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    return $pdo;
+}
