@@ -65,9 +65,18 @@ header {
   padding: 10px;
 }
 
-.table {
+.reserve_list_table {
   background-color: #fff;
 }
+
+.reserve_list_table td:not(:last-child) {
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* .reserve_list_table td {
+  line-height: 100px;
+} */
 
 .card {
   border: none;
