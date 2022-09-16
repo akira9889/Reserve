@@ -1,3 +1,18 @@
+<?php
+require_once '../config/config.php';
+require_once '../functions.php';
+
+//データーベース接続
+$pdo = connect_db();
+//データベースから予約リストを取得
+$sql = "SELECT * FROM reserve";
+$stmt = $pdo->query($sql);
+$reserve_list = $stmt->fetchAll();
+
+//データベース切断
+$stmt = null;
+$pdo = null;
+?>
 <!doctype html>
 <html lang="ja">
 
@@ -54,48 +69,20 @@
         </div>
     </div>
 
-    <table class="table">
+    <table class="table reserve_list_table">
         <tbody>
-            <tr>
-                <td>1/1(土)</td>
-                <td>12:00</td>
-                <td>
-                    テスト太郎　4名 <br>
-                    XXX@XXX.xxx <br>
-                    111-111-1111 <br>
-                    概要欄に記載された文面…
-                </td>
-            </tr>
-            <tr>
-                <td>1/1(土)</td>
-                <td>12:00</td>
-                <td>
-                    テスト太郎　4名 <br>
-                    XXX@XXX.xxx <br>
-                    111-111-1111 <br>
-                    概要欄に記載された文面…
-                </td>
-            </tr>
-            <tr>
-                <td>1/1(土)</td>
-                <td>12:00</td>
-                <td>
-                    テスト太郎　4名 <br>
-                    XXX@XXX.xxx <br>
-                    111-111-1111 <br>
-                    概要欄に記載された文面…
-                </td>
-            </tr>
-            <tr>
-                <td>1/1(土)</td>
-                <td>12:00</td>
-                <td>
-                    テスト太郎　4名 <br>
-                    XXX@XXX.xxx <br>
-                    111-111-1111 <br>
-                    概要欄に記載された文面…
-                </td>
-            </tr>
+            <?php foreach ($reserve_list as $reserve) : ?>
+                <tr>
+                    <td><?= time_format_dw($reserve['reserve_date']) ?></td>
+                    <td><?= date('H:i', strtotime($reserve['reserve_time'])) ?></td>
+                    <td>
+                        <?= $reserve['name'] ?>　<?= $reserve['reserve_num'] . '名' ?> <br>
+                        <?= $reserve['email'] ?> <br>
+                        <?= $reserve['tel'] ?> <br>
+                        <?= $reserve['comment'] ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
         </tbody>
     </table>
 

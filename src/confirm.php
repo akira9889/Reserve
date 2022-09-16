@@ -25,10 +25,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->bindValue('comment', $session_reserve['comment'], PDO::PARAM_STR);
     $stmt->execute();
 
+    $stmt = null;
+    $pdo = null;
+
     //セッション情報を消去
     $_SESSION = array();
     session_destroy();
-    
+
     // 予約完了画面へ遷移
     header('Location: /complete.php');
     exit;

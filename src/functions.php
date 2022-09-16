@@ -31,3 +31,17 @@ function connect_db()
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
     return $pdo;
 }
+
+function time_format_dw($date)
+{
+    $format_date = NULL;
+    $week = array('日', '月', '火', '水', '木', '金', '土');
+
+    if ($date) {
+        $format_date = date('n/j(' . $week[date('w', strtotime($date))] . ')', strtotime($date));
+    }
+
+    return $format_date;
+}
+
+
