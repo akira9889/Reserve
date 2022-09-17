@@ -1,4 +1,5 @@
 <?php
+require_once 'config/config.php';
 require_once 'functions.php';
 
 //TODO予約日選択肢配列
@@ -71,13 +72,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $err['tel'] = '電話番号を入力してください';
     } elseif (mb_strlen($tel, 'utf-8') > 20) {
         $err['tel'] = '電話番号は20文字以内で入力してください';
-    } elseif (!preg_match('/^[0-9]{2,4}-[0-9]{2,4}-[0-9]{3,4}$/', $tel)) {
+    } elseif (!preg_match('/^[0-9]{2,4}-[0-9]{2,4}-[0-9]{3,4}$/', $tel) && !preg_match('/^[0-9]{2,4}[0-9]{2,4}[0-9]{3,4}$/', $tel)) {
         $err['tel'] = '電話番号を正しく入力してください';
     }
 
     if (mb_strlen($comment, 'utf-8') > 2000) {
         $err['comment'] = '備考欄は2000文字以内で入力してください';
     }
+
+    //reserveテーブルから予約した日付のデータを取得
+    $pdo = connect_db();
+    $sql = "SELECT * FROM reserve WHERE reserve_date = :reserve_date AND reserve_time = :reserve_time LIMIT 1";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue('reserve_date', substr_replace(substr_replace($reserve_date, '-', -2, 0), '-', 4, 0), PDO::PARAM_STR);
+    $stmt->bindValue('reserve_time', $reserve_time, PDO::PARAM_STR);
+    $stmt->execute();
+    $reserve = $stmt->fetch();
+
+    // var_dump($reserve);
+    // exit;
 
     //エラーがなければ次の処理に進む
     if (empty($err)) {
@@ -90,9 +103,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_SESSION['RESERVE']['tel'] = $tel;
         $_SESSION['RESERVE']['comment'] = $comment;
 
-        //予約確認画面へ遷移
-        header('Location: confirm.php');
-        exit;
+        //対象日があればエラー
+        if ($reserve) {
+            $err['reserve'] = time_format_dw(insertHyphenDate($reserve_date)) . '&nbsp&nbsp' . "{$reserve_time}時での予約が先にあるため予約できません。<br> 違う時間を選んでください。";
+        } else {
+            // 予約確認画面へ遷移
+            header('Location: confirm.php');
+            exit;
+        }
     }
 } else {
     //セッションに入力情報がある場合は取得する
@@ -137,6 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <header>SAMPLE SHOP</header>
     <h1>ご来店予約</h1>
     <form class="m-3" method="post">
+        <p style="color: #dc3545;"><?php if (isset($err['reserve'])) echo $err['reserve'] ?></p>
         <div class="mb-3">
             <label for="exampleFormControlInput1" class="form-label">【1】予約日を選択</label>
             <?= arrayToSelect('reserve_date', $reserve_date_array, $reserve_date) ?>
@@ -173,7 +192,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         <div class="d-grid gap-2">
             <button class="btn btn-primary rounded-pill" type="submit">確認画面へ</button>
-            <button class="btn btn-secondary  rounded-pill" type="button">戻る</button>
         </div>
     </form>
 

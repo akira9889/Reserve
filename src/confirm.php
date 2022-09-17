@@ -11,7 +11,7 @@ $session_reserve = $_SESSION['RESERVE'];
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     //データベース接続
 
-    $reserve_date = substr_replace(substr_replace($session_reserve['reserve_date'], '-', -2, 0), '-', 4, 0);
+    $reserve_date = insertHyphenDate($session_reserve['reserve_date']);
 
     // セッション情報をreserveテーブルにINSERT
     $sql = "INSERT INTO reserve(reserve_date, reserve_time, reserve_num, name, email, tel, comment) VALUES(:reserve_date, :reserve_time, :reserve_num, :name, :email, :tel, :comment)";
