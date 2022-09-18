@@ -9,7 +9,6 @@ $pdo = connect_db();
 $session_reserve = $_SESSION['RESERVE'];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    //データベース接続
 
     $reserve_date = insertHyphenDate($session_reserve['reserve_date']);
 
