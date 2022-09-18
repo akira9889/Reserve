@@ -10,8 +10,9 @@ $stmt = $pdo->query($sql);
 $shop = $stmt->fetch();
 //予約可能日を取得
 $reservable_date = $shop['reservable_date'];
+$max_reserve_num = $shop['max_reserve_num'];
 
-//TODO予約日選択肢配列作成
+//予約日選択肢配列作成
 $reserve_date_array = [];
 
 for ($i = date('Y-m-d'); $i < date('Y-m-d', strtotime("+{$reservable_date} day")); $i = date('Y-m-d', strtotime($i . '+1 day'))) {
@@ -24,14 +25,15 @@ foreach ($reserve_date_array as $key => $reserve_date) {
     $reserve_date_array[$key] = time_format_dw($reserve_date);
 }
 
-//TODO予約最大人数選択肢配列
-$reserve_num_array = [
-    "1" => "1",
-    "2" => "2",
-    "3" => "3"
-];
+//予約最大人数選択肢配列作成
+$reserve_num_array = [];
+for ($i = 1; $i <= $max_reserve_num; $i++) {
+    $reserve_num_array[] = $i;
+}
 
-//TODO予約日選択肢配列
+$reserve_num_array = array_combine($reserve_num_array, $reserve_num_array);
+
+//TODO予約時間選択肢配列
 $reserve_time_array = [
     "12:00" => "12:00",
     "13:00" => "13:00",
