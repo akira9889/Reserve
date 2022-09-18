@@ -18,21 +18,6 @@ function arrayToSelect($inputName, $srcArray, $selectedIndex = "")
 
 }
 
-function insertHyphenDate($date)
-{
-
-    $includeHyphenDate = substr_replace($date, '-', -2, 0);
-    $includeHyphenDate = substr_replace($includeHyphenDate, '-', 4, 0);
-
-    return $includeHyphenDate;
-}
-
-
-function date_format_dw(string $date) {
-    $yyyymmdd =  insertHyphenDate($date);
-    return date('n/j', strtotime($yyyymmdd));
-}
-
 function connect_db()
 {
     $param = 'mysql:dbname=' . DB_NAME . ';host=' . DB_HOST . '';

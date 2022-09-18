@@ -2,12 +2,27 @@
 require_once 'config/config.php';
 require_once 'functions.php';
 
-//TODO予約日選択肢配列
-$reserve_date_array = [
-    "20220601" => "6/1",
-    "20220602" => "6/2",
-    "20220603" => "6/3"
-];
+$pdo = connect_db();
+
+//予約設定情報を取得
+$sql = "SELECT * FROM shop";
+$stmt = $pdo->query($sql);
+$shop = $stmt->fetch();
+//予約可能日を取得
+$reservable_date = $shop['reservable_date'];
+
+//TODO予約日選択肢配列作成
+$reserve_date_array = [];
+
+for ($i = date('Y-m-d'); $i < date('Y-m-d', strtotime("+{$reservable_date} day")); $i = date('Y-m-d', strtotime($i . '+1 day'))) {
+    $reserve_date_array[] = $i;
+}
+
+$reserve_date_array = array_combine($reserve_date_array, $reserve_date_array);
+
+foreach ($reserve_date_array as $key => $reserve_date) {
+    $reserve_date_array[$key] = time_format_dw($reserve_date);
+}
 
 //TODO予約最大人数選択肢配列
 $reserve_num_array = [
@@ -81,10 +96,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     //reserveテーブルから予約した日付のデータを取得
-    $pdo = connect_db();
     $sql = "SELECT * FROM reserve WHERE reserve_date = :reserve_date AND reserve_time = :reserve_time LIMIT 1";
     $stmt = $pdo->prepare($sql);
-    $stmt->bindValue('reserve_date', insertHyphenDate($reserve_date), PDO::PARAM_STR);
+    $stmt->bindValue('reserve_date', $reserve_date, PDO::PARAM_STR);
     $stmt->bindValue('reserve_time', $reserve_time, PDO::PARAM_STR);
     $stmt->execute();
     $reserve = $stmt->fetch();
@@ -105,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         //対象日があればエラー
         if ($reserve) {
-            $err['reserve'] = time_format_dw(insertHyphenDate($reserve_date)) . '&nbsp&nbsp' . "{$reserve_time}時での予約が先にあるため予約できません。<br> 違う時間を選んでください。";
+            $err['reserve'] = time_format_dw($reserve_date) . '&nbsp&nbsp' . "{$reserve_time}時での予約が先にあるため予約できません。<br> 違う時間を選んでください。";
         } else {
             // 予約確認画面へ遷移
             header('Location: confirm.php');
