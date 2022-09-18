@@ -11,11 +11,13 @@ $shop = $stmt->fetch();
 //予約可能日を取得
 $reservable_date = $shop['reservable_date'];
 $max_reserve_num = $shop['max_reserve_num'];
+$start_time = $shop['start_time'];
+$end_time = $shop['end_time'];
 
 //予約日選択肢配列作成
 $reserve_date_array = [];
 
-for ($i = date('Y-m-d'); $i < date('Y-m-d', strtotime("+{$reservable_date} day")); $i = date('Y-m-d', strtotime($i . '+1 day'))) {
+for ($i = date('Y-m-d'); $i <= date('Y-m-d', strtotime("+{$reservable_date} day")); $i = date('Y-m-d', strtotime($i . '+1 day'))) {
     $reserve_date_array[] = $i;
 }
 
@@ -34,11 +36,16 @@ for ($i = 1; $i <= $max_reserve_num; $i++) {
 $reserve_num_array = array_combine($reserve_num_array, $reserve_num_array);
 
 //TODO予約時間選択肢配列
-$reserve_time_array = [
-    "12:00" => "12:00",
-    "13:00" => "13:00",
-    "14:00" => "14:00"
-];
+$reserve_time_array = [];
+
+for ($i = date('Y-m-d H:i:s', strtotime($start_time));
+    $i < date('Y-m-d H:i:s', strtotime($end_time));
+    $i = date('Y-m-d H:i:s', strtotime($i . '+1 hours')))
+{
+    $reserve_time_array[] = date('G:i', strtotime($i));
+}
+
+$reserve_time_array = array_combine($reserve_time_array, $reserve_time_array);
 
 session_start();
 
@@ -105,8 +112,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->execute();
     $reserve = $stmt->fetch();
 
-    // var_dump($reserve);
-    // exit;
+    $stmt = null;
+    $pdo = null;
 
     //エラーがなければ次の処理に進む
     if (empty($err)) {

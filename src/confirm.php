@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <tbody>
             <tr>
                 <th scope="row">日時</th>
-                <td><?= time_format_dw($_SESSION['RESERVE']['reserve_date'])  ?> <?= $_SESSION['RESERVE']['reserve_time'] ?></td>
+                <td><?= time_format_dw($_SESSION['RESERVE']['reserve_date'])  ?> 　予約時間 <?= $_SESSION['RESERVE']['reserve_time'] ?></td>
             </tr>
             <tr>
                 <th scope="row">人数</th>
