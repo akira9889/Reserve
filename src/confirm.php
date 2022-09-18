@@ -10,7 +10,7 @@ $session_reserve = $_SESSION['RESERVE'];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-    $reserve_date = insertHyphenDate($session_reserve['reserve_date']);
+    $reserve_date = $session_reserve['reserve_date'];
 
     // セッション情報をreserveテーブルにINSERT
     $sql = "INSERT INTO reserve(reserve_date, reserve_time, reserve_num, name, email, tel, comment) VALUES(:reserve_date, :reserve_time, :reserve_num, :name, :email, :tel, :comment)";
@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <tbody>
             <tr>
                 <th scope="row">日時</th>
-                <td><?= date_format_dw($_SESSION['RESERVE']['reserve_date'])  ?> <?= $_SESSION['RESERVE']['reserve_time'] ?></td>
+                <td><?= time_format_dw($_SESSION['RESERVE']['reserve_date'])  ?> <?= $_SESSION['RESERVE']['reserve_time'] ?></td>
             </tr>
             <tr>
                 <th scope="row">人数</th>
