@@ -9,7 +9,7 @@ $reserve_date_array = [
     "20220603" => "6/3"
 ];
 
-//TODO選択肢配列
+//TODO予約最大人数選択肢配列
 $reserve_num_array = [
     "1" => "1",
     "2" => "2",
@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $pdo = connect_db();
     $sql = "SELECT * FROM reserve WHERE reserve_date = :reserve_date AND reserve_time = :reserve_time LIMIT 1";
     $stmt = $pdo->prepare($sql);
-    $stmt->bindValue('reserve_date', substr_replace(substr_replace($reserve_date, '-', -2, 0), '-', 4, 0), PDO::PARAM_STR);
+    $stmt->bindValue('reserve_date', insertHyphenDate($reserve_date), PDO::PARAM_STR);
     $stmt->bindValue('reserve_time', $reserve_time, PDO::PARAM_STR);
     $stmt->execute();
     $reserve = $stmt->fetch();
