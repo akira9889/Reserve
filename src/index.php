@@ -105,12 +105,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     //reserveテーブルから予約した日付のデータを取得
-    $sql = "SELECT * FROM reserve WHERE reserve_date = :reserve_date AND reserve_time = :reserve_time LIMIT 1";
+    $sql = "SELECT * FROM reserve WHERE reserve_date = :reserve_date AND reserve_time = :reserve_time";
     $stmt = $pdo->prepare($sql);
     $stmt->bindValue('reserve_date', $reserve_date, PDO::PARAM_STR);
     $stmt->bindValue('reserve_time', $reserve_time, PDO::PARAM_STR);
     $stmt->execute();
-    $reserve = $stmt->fetch();
+    $reserve = $stmt->fetchAll();
+
+    //予約できる人数
+    $max_reservable_num = $max_reserve_num - count($reserve);
 
     $stmt = null;
     $pdo = null;
@@ -127,8 +130,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_SESSION['RESERVE']['comment'] = $comment;
 
         //対象日があればエラー
-        if ($reserve) {
-            $err['reserve'] = time_format_dw($reserve_date) . '&nbsp&nbsp' . "{$reserve_time}時での予約が先にあるため予約できません。<br> 違う時間を選んでください。";
+        if ($max_reservable_num < $reserve_num) {
+            $err['reserve'] = time_format_dw($reserve_date) . '&nbsp&nbsp' . "{$reserve_time}時での予約人数が{$reserve_num}人だと上限に達してしまうため、{$max_reservable_num}人までしか予約できません。もしくは違う時間を選んでください。";
         } else {
             // 予約確認画面へ遷移
             header('Location: confirm.php');
