@@ -8,7 +8,8 @@ $pdo = connect_db();
 $sql = "SELECT * FROM shop";
 $stmt = $pdo->query($sql);
 $shop = $stmt->fetch();
-//予約可能日を取得
+
+//予約可能情報を取得
 $reservable_date = $shop['reservable_date'];
 $max_reserve_num = $shop['max_reserve_num'];
 $start_time = $shop['start_time'];
@@ -35,21 +36,37 @@ for ($i = 1; $i <= $max_reserve_num; $i++) {
 
 $reserve_num_array = array_combine($reserve_num_array, $reserve_num_array);
 
-//TODO予約時間選択肢配列
+//予約時間選択肢配列
 $reserve_time_array = [];
 
-for ($i = date('Y-m-d H:i:s', strtotime($start_time));
-    $i < date('Y-m-d H:i:s', strtotime($end_time));
-    $i = date('Y-m-d H:i:s', strtotime($i . '+1 hours')))
-{
-    $reserve_time_array[] = date('G:i', strtotime($i));
+if (date('Y-m-d H:i:s', strtotime($start_time)) <= date('Y-m-d H:i:s', strtotime($end_time))) {
+    for ($i = date('Y-m-d H:i:s', strtotime($start_time));
+        $i <= date('Y-m-d H:i:s', strtotime($end_time));
+        $i = date('Y-m-d H:i:s', strtotime($i . '+1 hours')))
+    {
+        $reserve_time_array[] = date('G:i', strtotime($i));
+    }
+} else {
+    for ($i = date('Y-m-d H:i:s', strtotime($start_time));
+        $i <= date('Y-m-d H:i:s', strtotime('23:00:00'));
+        $i = date('Y-m-d H:i:s', strtotime($i . '+1 hours')))
+    {
+        $reserve_time_array[] = date('G:i', strtotime($i));
+    }
+
+    for ($i = date('Y-m-d H:i:s', strtotime('00:00:00'));
+        $i <= date('Y-m-d H:i:s', strtotime($end_time));
+        $i = date('Y-m-d H:i:s', strtotime($i . '+1 hours')))
+    {
+        $reserve_time_array[] = date('H:i', strtotime($i));
+    }
 }
 
 $reserve_time_array = array_combine($reserve_time_array, $reserve_time_array);
 
 session_start();
 
-$err = array();
+$err = [];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     //POSTパラメータから各種入力値を受け取る
@@ -63,20 +80,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     //各種入力値のバリデーション
     if (!$reserve_date) {
-        $err['reserve_date'] = '予約日を入力してください';
+        $err['reserve_date'] = '予約日を選択してください';
+    } elseif ($reserve_date < date('Y-m-d') || date('Y-m-d', strtotime("{$reservable_date} day")) < $reserve_date) {
+        $err['reserve_date'] = '予約日が不正です。';
     }
-    //TODO:予約日はプルダウン設定値を決定後にバリデーション実装
 
     if (!$reserve_num) {
-        $err['reserve_num'] = '人数を入力してください';
+        $err['reserve_num'] = '人数を選択してください';
     } elseif (!preg_match('/^[0-9]+$/', $reserve_num)) {
-        $err['reserve_num'] = '人数を正しく入力してください';
+        $err['reserve_num'] = '不正な値です。';
     }
 
     if (!$reserve_time) {
-        $err['reserve_time'] = '予約時間を入力してください';
+        $err['reserve_time'] = '予約時間を選択してください';
     }
-    //TODO:予約時間はプルダウン設定値を決定後にバリデーション実装
+    //予約時間はプルダウン設定値を決定後にバリデーション実装
+    if($start_time < $end_time) {
+        if (
+            date('Y-m-d H:i', strtotime($reserve_time)) < date('Y-m-d H:i', strtotime($start_time)) ||
+            date('Y-m-d H:i', strtotime($end_time)) < date('Y-m-d H:i', strtotime($reserve_time))
+        ) {
+            $err['reserve_time'] = '予約時間が時間外です。';
+        }
+    } else {
+        if (
+            date('Y-m-d H:i', strtotime($end_time)) < date('Y-m-d H:i', strtotime($reserve_time)) &&
+            date('Y-m-d H:i', strtotime($reserve_time)) < date('Y-m-d H:i', strtotime($start_time))
+            ) {
+                $err['reserve_time'] = '予約時間が時間外です。';
+            }
+    }
 
     if (!$name) {
         $err['name'] = '氏名を入力してください';
@@ -184,17 +217,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <p style="color: #dc3545;"><?php if (isset($err['reserve'])) echo $err['reserve'] ?></p>
         <div class="mb-3">
             <label for="exampleFormControlInput1" class="form-label">【1】予約日を選択</label>
-            <?= arrayToSelect('reserve_date', $reserve_date_array, $reserve_date) ?>
+            <?= arrayToSelect('reserve_date', $reserve_date_array, $err['reserve_date'], $reserve_date) ?>
             <div class="invalid-feedback"><?= $err['reserve_date'] ?></div>
         </div>
         <div class="mb-3">
             <label for="exampleFormControlInput1" class="form-label">【2】人数選択</label>
-            <?= arrayToSelect('reserve_num', $reserve_num_array, $reserve_num) ?>
+            <?= arrayToSelect('reserve_num', $reserve_num_array, $err['reserve_num'], $reserve_num) ?>
             <div class="invalid-feedback"><?= $err['reserve_num'] ?></div>
         </div>
         <div class="mb-3">
             <label for="exampleFormControlInput1" class="form-label">【3】予約時間を選択</label>
-            <?= arrayToSelect('reserve_time', $reserve_time_array, $reserve_time) ?>
+            <?= arrayToSelect('reserve_time', $reserve_time_array, $err['reserve_time'], $reserve_time) ?>
             <div class="invalid-feedback"><?= $err['reserve_time'] ?></div>
         </div>
         <div class="mb-3">
@@ -212,7 +245,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
         <div class="mb-3">
             <label for="exampleFormControlTextarea1" class="form-label">【5】備考欄</label>
-            <textarea class="form-control <?php if (isset($err['comment'])) echo 'is-invalid' ?>" name="comment" rows="3" placeholder="備考欄"><?= $comment ?></textarea>
+            <textarea class="form-control <?php if (isset($err['comment'])) echo 'is-invalid' ?>" name="comment" rows="3" placeholder="備考欄"><?= h($comment) ?></textarea>
             <div class="invalid-feedback"><?= $err['comment'] ?></div>
         </div>
 
