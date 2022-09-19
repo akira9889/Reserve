@@ -1,7 +1,11 @@
 <?php
-function arrayToSelect($inputName, $srcArray, $selectedIndex = "")
+function arrayToSelect($inputName, $srcArray, $err, $selectedIndex = "")
 {
-    $temphtml = "<select class=\"form-select\" name=\"{$inputName}\">" . PHP_EOL;
+    if (isset($err)) {
+        $temphtml = "<select class=\"form-select is-invalid\" name=\"{$inputName}\">" . PHP_EOL;
+    } else {
+        $temphtml = "<select class=\"form-select\" name=\"{$inputName}\">" . PHP_EOL;
+    }
 
     foreach ($srcArray as $key => $val) {
         if ($key == $selectedIndex) {
@@ -37,4 +41,20 @@ function time_format_dw($date)
     }
 
     return $format_date;
+}
+
+//時間の形式チェックを行う
+function check_time_format($time)
+{
+    if (preg_match('/^([01]?[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/', $time)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+//HTMLエスケープ処理（XSS対策）
+function h($original_str)
+{
+    return htmlspecialchars($original_str, ENT_QUOTES, 'UTF-8');
 }

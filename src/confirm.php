@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->bindValue('name', $session_reserve['name'], PDO::PARAM_STR);
     $stmt->bindValue('email', $session_reserve['email'], PDO::PARAM_STR);
     $stmt->bindValue('tel', $session_reserve['tel'], PDO::PARAM_STR);
-    $stmt->bindValue('comment', $session_reserve['comment'], PDO::PARAM_STR);
+    $stmt->bindValue('comment', h($session_reserve['comment']), PDO::PARAM_STR);
     $stmt->execute();
 
     $stmt = null;
@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </tr>
             <tr>
                 <th scope="row">氏名</th>
-                <td><?= $_SESSION['RESERVE']['name'] ?></td>
+                <td><?= h($_SESSION['RESERVE']['name']) ?></td>
             </tr>
             <tr>
                 <th scope="row">メールアドレス</th>
@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </tr>
             <tr>
                 <th scope="row">備考欄</th>
-                <td><?= nl2br($_SESSION['RESERVE']['comment']) ?></td>
+                <td><?= h(nl2br($_SESSION['RESERVE']['comment'])) ?></td>
             </tr>
         </tbody>
     </table>
