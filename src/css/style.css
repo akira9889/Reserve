@@ -98,3 +98,9 @@ header {
 .nav-icon {
   font-size: 1.3rem;
 }
+
+.setting_button {
+  max-width: 300px;
+  width: 100%;
+  margin: 0 auto;
+}
