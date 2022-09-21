@@ -2,16 +2,37 @@
 require_once '../config/config.php';
 require_once '../functions.php';
 
+//予約リストデータを取得
+if (isset($_GET['Y'])) {
+    $yyyy = $_GET['Y'];
+} else {
+    $yyyy = date('Y');
+}
+
+if (isset($_GET['m'])) {
+    $mm = $_GET['m'];
+} else {
+    $mm = date('m');
+}
+
+$target_yyyymm = $yyyy . '-' . $mm;
+
 //データーベース接続
 $pdo = connect_db();
-//データベースから予約リストを取得
-$sql = "SELECT * FROM reserve";
-$stmt = $pdo->query($sql);
+//データベースから指定した予約リストを取得
+$sql = "SELECT * FROM reserve WHERE DATE_FORMAT(reserve_date, '%Y-%m') = :reserve_date ORDER BY reserve_date, reserve_time ASC";
+$stmt = $pdo->prepare($sql);
+$stmt->bindValue(':reserve_date', $target_yyyymm, PDO::PARAM_STR);
+$stmt->execute();
 $reserve_list = $stmt->fetchAll();
+
+// var_dump($reserve_list);
+// exit;
 
 //データベース切断
 $stmt = null;
 $pdo = null;
+
 ?>
 <!doctype html>
 <html lang="ja">
@@ -48,26 +69,30 @@ $pdo = null;
 
     <h1>予約リスト</h1>
 
-    <div class="row m-3">
+    <form class="row m-3">
         <div class="col">
-            <select class="form-select" aria-label="Default select example">
-
-                <option selected>2022年</option>
-                <option value="1">One</option>
-                <option value="2">Two</option>
-                <option value="3">Three</option>
+            <select class="form-select" name="Y" onchange="submit(this.form)">
+                <option value="2022">2022年</option>
+                <?php for ($i = 1; $i < 12; $i++) : ?>
+                    <?php $target_yyyy = date('Y', strtotime(date('Y') . "+{$i}year")); ?>
+                    <option value="<?= $target_yyyy?>" <?php if ($yyyy == $target_yyyy) echo 'selected' ?>>
+                        <?= date('Y', strtotime(date($target_yyyy . '-m'))) . '年' ?>
+                    </option>
+                <?php endfor; ?>
             </select>
         </div>
         <div class="col">
-            <select class="form-select" aria-label="Default select example">
-
-                <option selected>1月</option>
-                <option value="1">One</option>
-                <option value="2">Two</option>
-                <option value="3">Three</option>
+            <select class="form-select" name="m" onchange="submit(this.form)">
+                <option value="<?= date('m') ?>"><?= date('n') . '月' ?></option>
+                <?php for ($i = 1; $i < 12; $i++) : ?>
+                    <?php $target_mm = date('m', strtotime(date('Y-m') . "+{$i}month")); ?>
+                    <option value="<?= $target_mm?>" <?php if ($mm == $target_mm) echo 'selected' ?>>
+                        <?= date('n', strtotime(date('Y-' . $target_mm))) . '月' ?>
+                    </option>
+                <?php endfor; ?>
             </select>
         </div>
-    </div>
+    </form>
 
     <table class="table reserve_list_table">
         <tbody>
