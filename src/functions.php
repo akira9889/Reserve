@@ -58,3 +58,10 @@ function h($original_str)
 {
     return htmlspecialchars($original_str, ENT_QUOTES, 'UTF-8');
 }
+
+function redirect($path)
+{
+    unset($pdo);
+    header('Location:' . $path);
+    exit;
+}
