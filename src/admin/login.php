@@ -12,22 +12,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $login_id = $_POST['login_id'];
     $login_password = $_POST['login_password'];
 
-    $pdo = connect_db();
+    $err = array();
 
-    $sql = 'SELECT login_id, login_password FROM shop WHERE login_id = :login_id AND login_password = :login_password LIMIT 1';
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindValue('login_id', $login_id, PDO::PARAM_STR);
-    $stmt->bindValue('login_password', $login_password, PDO::PARAM_STR);
-    $stmt->execute();
-    $user = $stmt->fetch();
+    if (!$login_id) {
+        $err['login_id'] = 'ログインIDを入力してください';
+    } elseif (mb_strlen($login_id, 'utf-8') > 20) {
+        $err['login_id'] = 'ログインIDが長すぎます';
+    }
 
-    if ($user) {
-        $_SESSION['USER'] = $user;
-        var_dump($user);
+    if (!$login_password) {
+        $err['login_password'] = 'パスワードを入力してください';
+    }
 
-        redirect('setting.php');
-    } else {
-        $err['password'] = '認証に失敗しました';
+    if (empty($err)) {
+
+        $pdo = connect_db();
+
+        $sql = 'SELECT login_id, login_password FROM shop WHERE login_id = :login_id AND login_password = :login_password LIMIT 1';
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue('login_id', $login_id, PDO::PARAM_STR);
+        $stmt->bindValue('login_password', $login_password, PDO::PARAM_STR);
+        $stmt->execute();
+        $user = $stmt->fetch();
+
+        if ($user) {
+            $_SESSION['USER'] = $user;
+            redirect('setting.php');
+            exit;
+        } else {
+            $err['login_password'] = '認証に失敗しました';
+        }
     }
 }
 
@@ -57,10 +71,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <form class="card text-center" method="post">
         <div class="card-body">
             <div class="mb-3">
-                <input type="text" class="form-control rounded-pill py-3" name="login_id" placeholder="ID">
+                <input type="text" class="form-control rounded-pill py-3 <?php if (isset($err['login_id'])) echo 'is-invalid'; ?>" name="login_id" placeholder="ID">
+                <div class="invalid-feedback"><?= $err['login_id'] ?></div>
             </div>
             <div class="mb-3">
-                <input type="password" class="form-control rounded-pill py-3" name="login_password" placeholder="パスワード">
+                <input type="password" class="form-control rounded-pill py-3 <?php if (isset($err['login_password'])) echo 'is-invalid'; ?>" name="login_password" placeholder="パスワード">
+                <div class="invalid-feedback"><?= $err['login_password'] ?></div>
             </div>
 
             <div class="d-grid gap-2">
