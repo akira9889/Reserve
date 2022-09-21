@@ -47,18 +47,18 @@ if (date('Y-m-d H:i:s', strtotime($start_time)) <= date('Y-m-d H:i:s', strtotime
         $reserve_time_array[] = date('G:i', strtotime($i));
     }
 } else {
+    for ($i = date('Y-m-d H:i:s', strtotime('00:00:00'));
+            $i <= date('Y-m-d H:i:s', strtotime($end_time));
+            $i = date('Y-m-d H:i:s', strtotime($i . '+1 hours')))
+        {
+            $reserve_time_array[] = date('H:i', strtotime($i));
+        }
+
     for ($i = date('Y-m-d H:i:s', strtotime($start_time));
         $i <= date('Y-m-d H:i:s', strtotime('23:00:00'));
         $i = date('Y-m-d H:i:s', strtotime($i . '+1 hours')))
     {
         $reserve_time_array[] = date('G:i', strtotime($i));
-    }
-
-    for ($i = date('Y-m-d H:i:s', strtotime('00:00:00'));
-        $i <= date('Y-m-d H:i:s', strtotime($end_time));
-        $i = date('Y-m-d H:i:s', strtotime($i . '+1 hours')))
-    {
-        $reserve_time_array[] = date('H:i', strtotime($i));
     }
 }
 
