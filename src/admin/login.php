@@ -1,3 +1,37 @@
+<?php
+require_once '../config/config.php';
+require_once '../functions.php';
+
+session_start();
+
+if (isset($_SESSION['USER'])) {
+    redirect('setting.php');
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $login_id = $_POST['login_id'];
+    $login_password = $_POST['login_password'];
+
+    $pdo = connect_db();
+
+    $sql = 'SELECT login_id, login_password FROM shop WHERE login_id = :login_id AND login_password = :login_password LIMIT 1';
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue('login_id', $login_id, PDO::PARAM_STR);
+    $stmt->bindValue('login_password', $login_password, PDO::PARAM_STR);
+    $stmt->execute();
+    $user = $stmt->fetch();
+
+    if ($user) {
+        $_SESSION['USER'] = $user;
+        var_dump($user);
+
+        redirect('setting.php');
+    } else {
+        $err['password'] = '認証に失敗しました';
+    }
+}
+
+?>
 <!doctype html>
 <html lang="ja">
 
@@ -12,21 +46,21 @@
     <!-- Original CSS -->
     <link href="/css/style.css" rel="stylesheet">
 
-    <title>ご来店予約</title>
+    <title>管理ログイン画面</title>
 </head>
 
 <body>
     <header>SAMPLE SHOP</header>
 
-    <h1>ご来店予約</h1>
+    <h1>ログイン</h1>
 
-    <form class="card text-center" method="post" action="reserve_list.php">
+    <form class="card text-center" method="post">
         <div class="card-body">
             <div class="mb-3">
-                <input type="text" class="form-control rounded-pill py-3" id="exampleFormControlInput1" placeholder="ID">
+                <input type="text" class="form-control rounded-pill py-3" name="login_id" placeholder="ID">
             </div>
             <div class="mb-3">
-                <input type="password" class="form-control rounded-pill py-3" id="exampleFormControlInput1" placeholder="パスワード">
+                <input type="password" class="form-control rounded-pill py-3" name="login_password" placeholder="パスワード">
             </div>
 
             <div class="d-grid gap-2">
@@ -35,16 +69,8 @@
         </div>
     </form>
 
-        <!-- Optional JavaScript; choose one of the two! -->
-
-        <!-- Option 1: Bootstrap Bundle with Popper -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-
-        <!-- Option 2: Separate Popper and Bootstrap JS -->
-        <!--
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
-    -->
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 </body>
 
 </html>
