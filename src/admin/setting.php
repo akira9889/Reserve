@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $err['max_reserve_num'] = 'リストから選んでください。';
     }
 
-    if(empty($err)) {
+    if (empty($err)) {
         if ($shop) {
             $sql = "UPDATE shop SET reservable_date = :reservable_date, start_time = :start_time, end_time = :end_time, max_reserve_num = :max_reserve_num";
             $stmt = $pdo->prepare($sql);
@@ -92,42 +92,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 }
+
+$dirs = explode('/', __DIR__);
+$thisdir = array_pop($dirs);
+
+$path = '../';
+$page_title = '予約設定';
 ?>
 <!doctype html>
 <html lang="ja">
 
-<head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
-
-    <!-- Original CSS -->
-    <link href="/css/style.css" rel="stylesheet">
-
-    <title>設定</title>
-</head>
+<?php include('../templates/head_tag.php'); ?>
 
 <body>
-
-    <header class="navbar">
-        <div class="container-fluid">
-            <a href="../index.php" class="navbar-brand">SAMPLE SHOP</a>
-            <form class="d-flex">
-                <a href="/admin/reserve_list.php" class="mx-3"><i class="bi bi-list-task nav-icon"></i></a>
-                <a href="/admin/setting.php"><i class="bi bi-gear nav-icon"></i></a>
-
-            </form>
-        </div>
-    </header>
-
-    <h1>設定</h1>
-
+    <?php include('../templates/header.php'); ?>
     <form class="card" method="post">
         <div class="card-body container">
             <div class="mb-3">
