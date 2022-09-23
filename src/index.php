@@ -40,24 +40,27 @@ $reserve_num_array = array_combine($reserve_num_array, $reserve_num_array);
 $reserve_time_array = [];
 
 if (date('Y-m-d H:i:s', strtotime($start_time)) <= date('Y-m-d H:i:s', strtotime($end_time))) {
-    for ($i = date('Y-m-d H:i:s', strtotime($start_time));
+    for (
+        $i = date('Y-m-d H:i:s', strtotime($start_time));
         $i <= date('Y-m-d H:i:s', strtotime($end_time));
-        $i = date('Y-m-d H:i:s', strtotime($i . '+1 hours')))
-    {
+        $i = date('Y-m-d H:i:s', strtotime($i . '+1 hours'))
+    ) {
         $reserve_time_array[] = date('G:i', strtotime($i));
     }
 } else {
-    for ($i = date('Y-m-d H:i:s', strtotime('00:00:00'));
-            $i <= date('Y-m-d H:i:s', strtotime($end_time));
-            $i = date('Y-m-d H:i:s', strtotime($i . '+1 hours')))
-        {
-            $reserve_time_array[] = date('H:i', strtotime($i));
-        }
+    for (
+        $i = date('Y-m-d H:i:s', strtotime('00:00:00'));
+        $i <= date('Y-m-d H:i:s', strtotime($end_time));
+        $i = date('Y-m-d H:i:s', strtotime($i . '+1 hours'))
+    ) {
+        $reserve_time_array[] = date('H:i', strtotime($i));
+    }
 
-    for ($i = date('Y-m-d H:i:s', strtotime($start_time));
+    for (
+        $i = date('Y-m-d H:i:s', strtotime($start_time));
         $i <= date('Y-m-d H:i:s', strtotime('23:00:00'));
-        $i = date('Y-m-d H:i:s', strtotime($i . '+1 hours')))
-    {
+        $i = date('Y-m-d H:i:s', strtotime($i . '+1 hours'))
+    ) {
         $reserve_time_array[] = date('G:i', strtotime($i));
     }
 }
@@ -95,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $err['reserve_time'] = '予約時間を選択してください';
     }
     //予約時間はプルダウン設定値を決定後にバリデーション実装
-    if($start_time < $end_time) {
+    if ($start_time < $end_time) {
         if (
             date('Y-m-d H:i', strtotime($reserve_time)) < date('Y-m-d H:i', strtotime($start_time)) ||
             date('Y-m-d H:i', strtotime($end_time)) < date('Y-m-d H:i', strtotime($reserve_time))
@@ -106,9 +109,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (
             date('Y-m-d H:i', strtotime($end_time)) < date('Y-m-d H:i', strtotime($reserve_time)) &&
             date('Y-m-d H:i', strtotime($reserve_time)) < date('Y-m-d H:i', strtotime($start_time))
-            ) {
-                $err['reserve_time'] = '予約時間が時間外です。';
-            }
+        ) {
+            $err['reserve_time'] = '予約時間が時間外です。';
+        }
     }
 
     if (!$name) {
@@ -192,27 +195,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $comment = '';
     }
 }
+$path = '';
+$page_title = 'ご来店予約';
 ?>
 <!doctype html>
 <html lang="ja">
 
-<head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-
-    <!-- Original CSS -->
-    <link href="/css/style.css" rel="stylesheet">
-
-    <title>ご来店予約</title>
-</head>
+<?php include('templates/head_tag.php'); ?>
 
 <body>
-    <header>SAMPLE SHOP</header>
-    <h1>ご来店予約</h1>
+    <?php include('templates/header.php'); ?>
     <form class="m-3" method="post">
         <p style="color: #dc3545;"><?php if (isset($err['reserve'])) echo $err['reserve'] ?></p>
         <div class="mb-3">

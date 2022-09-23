@@ -35,27 +35,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     header('Location: /complete.php');
     exit;
 }
+$path = '';
+$page_title = '予約内容確認';
 ?>
 <!doctype html>
 <html lang="ja">
 
-<head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-
-    <!-- Original CSS -->
-    <link href="/css/style.css" rel="stylesheet">
-
-    <title>予約内容確認</title>
-</head>
+<?php include('templates/head_tag.php'); ?>
 
 <body>
-    <header>SAMPLE SHOP</header>
-    <h1>予約内容確認</h1>
+    <?php include('templates/header.php'); ?>
     <table class="table">
         <tbody>
             <tr>

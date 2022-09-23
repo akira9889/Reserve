@@ -36,6 +36,8 @@ $reserve_list = $stmt->fetchAll();
 $stmt = null;
 $pdo = null;
 
+$dirs = explode('/', __DIR__);
+$thisdir = array_pop($dirs);
 ?>
 <!doctype html>
 <html lang="ja">
