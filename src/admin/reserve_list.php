@@ -23,6 +23,11 @@ if (isset($_GET['m'])) {
 
 $target_yyyymm = $yyyy . '-' . $mm;
 
+if ($target_yyyymm < date('Y-m')) {
+    $mm = date('m');
+    $target_yyyymm = $yyyy . '-' . $mm;
+}
+
 //データーベース接続
 $pdo = connect_db();
 //データベースから指定した予約リストを取得
@@ -38,26 +43,14 @@ $pdo = null;
 
 $dirs = explode('/', __DIR__);
 $thisdir = array_pop($dirs);
+
+$path = '../';
+$page_title = '予約リスト';
 ?>
 <!doctype html>
 <html lang="ja">
 
-<head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
-
-    <!-- Original CSS -->
-    <link href="/css/style.css" rel="stylesheet">
-
-    <title>予約リスト</title>
-</head>
+<?php include('../templates/head_tag.php'); ?>
 
 <body>
     <header class="navbar">
@@ -73,24 +66,35 @@ $thisdir = array_pop($dirs);
 
     <h1>予約リスト</h1>
 
-    <form class="row m-3">
+    <form id="reserve-form" class="row m-3">
         <div class="col">
-            <select class="form-select" name="Y" onchange="submit(this.form)">
-                <option value="2022">2022年</option>
-                <?php for ($i = 1; $i < 12; $i++) : ?>
+            <select id="form-year" class="form-select" name="Y">
+                <?php for ($i = 0; $i < 5; $i++) : ?>
                     <?php $target_yyyy = date('Y', strtotime(date('Y') . "+{$i}year")); ?>
-                    <option value="<?= $target_yyyy?>" <?php if ($yyyy == $target_yyyy) echo 'selected' ?>>
+                    <option value="<?= $target_yyyy ?>" <?php if ($yyyy == $target_yyyy) echo 'selected' ?>>
                         <?= date('Y', strtotime(date($target_yyyy . '-m'))) . '年' ?>
                     </option>
                 <?php endfor; ?>
             </select>
         </div>
         <div class="col">
-            <select class="form-select" name="m" onchange="submit(this.form)">
-                <option value="<?= date('m') ?>"><?= date('n') . '月' ?></option>
-                <?php for ($i = 1; $i < 12; $i++) : ?>
-                    <?php $target_mm = date('m', strtotime(date('Y-m') . "+{$i}month")); ?>
-                    <option value="<?= $target_mm?>" <?php if ($mm == $target_mm) echo 'selected' ?>>
+            <select id="form-month" class="form-select" name="m" onchange="submit(this.form)">
+                <?php
+                if ($yyyy == date('Y')) {
+                    $month_count = 12 - ltrim(date('m'));
+                } else {
+                    $month_count = 11;
+                }
+                ?>
+                <?php for ($i = 0; $i <= $month_count; $i++) : ?>
+                    <?php
+                    if ($yyyy == date('Y')) {
+                        $target_mm = date('m', strtotime(date('Y-m') . "+{$i}month"));
+                    } else {
+                        $target_mm = date('m', strtotime(date('Y-01') . "+{$i}month"));
+                    }
+                    ?>
+                    <option value="<?= $target_mm ?>" <?php if ($mm == $target_mm) echo 'selected' ?>>
                         <?= date('n', strtotime(date('Y-' . $target_mm))) . '月' ?>
                     </option>
                 <?php endfor; ?>
@@ -115,8 +119,34 @@ $thisdir = array_pop($dirs);
         </tbody>
     </table>
 
-    <!-- Option 1: Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <?php include('../templates/footer.php'); ?>
+
+    <script>
+        // NUM=値 LEN=桁数
+        function zeroPadding(NUM, LEN) {
+            return (Array(LEN).join('0') + NUM).slice(-LEN);
+        }
+
+        //年度を変えた時、変えた年の月が今月より前だったら、月のフォーム値を今月に変える
+        let now = new Date();
+        let current_year = now.getFullYear();
+        let current_month = now.getMonth() + 1;
+        let previous_year;
+
+        $("#form-year").on('focus', function() {
+            previous_year = Number(this.value);
+            previous_month = Number($('#form-month').val());
+        }).change(function() {
+            target_year = Number($('#form-year').val());
+            if (previous_year > target_year && target_year == current_year) {
+                if (previous_month < current_month) {
+                    $('#form-month').val(zeroPadding(current_month, 2));
+                    console.log($('#form-month').val());
+                }
+            }
+            $('#reserve-form').submit();
+        });
+    </script>
 </body>
 
 </html>
