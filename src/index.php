@@ -96,6 +96,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if (!$reserve_time) {
         $err['reserve_time'] = '予約時間を選択してください';
+    } elseif (!preg_match('/^([01]?[0-9]|2[0-3]):([0-5][0-9])$/', $reserve_time)) {
+        $err['reserve_time'] = '予約時間が時間外です。';
     }
     //予約時間はプルダウン設定値を決定後にバリデーション実装
     if ($start_time < $end_time) {
@@ -151,6 +153,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     //予約できる人数
     $max_reservable_num = $max_reserve_num - count($reserve);
 
+    //対象の日時の人数が上限であればエラー
+    if ($max_reservable_num < $reserve_num) {
+        $err['reserve'] = time_format_dw($reserve_date) . '&nbsp&nbsp' . "{$reserve_time}時での予約人数が{$reserve_num}人だと上限に達してしまうため、{$max_reservable_num}人までしか予約できません。もしくは違う時間を選んでください。";
+    }
+    if ($max_reservable_num == 0) {
+        $err['reserve'] = 'この時間での予約は埋まりました。違う時間を選んでください。';
+    }
+
     $stmt = null;
     $pdo = null;
 
@@ -165,14 +175,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_SESSION['RESERVE']['tel'] = $tel;
         $_SESSION['RESERVE']['comment'] = $comment;
 
-        //対象日があればエラー
-        if ($max_reservable_num < $reserve_num) {
-            $err['reserve'] = time_format_dw($reserve_date) . '&nbsp&nbsp' . "{$reserve_time}時での予約人数が{$reserve_num}人だと上限に達してしまうため、{$max_reservable_num}人までしか予約できません。もしくは違う時間を選んでください。";
-        } else {
-            // 予約確認画面へ遷移
-            header('Location: confirm.php');
-            exit;
-        }
+        // 予約確認画面へ遷移
+        header('Location: confirm.php');
+        exit;
     }
 } else {
     //セッションに入力情報がある場合は取得する
@@ -250,12 +255,6 @@ $page_title = 'ご来店予約';
 
     <!-- Option 1: Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-
-    <!-- Option 2: Separate Popper and Bootstrap JS -->
-    <!--
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
-    -->
 </body>
 
 </html>

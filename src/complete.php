@@ -13,6 +13,7 @@ $page_title = '予約内容確認';
         <div class="card-body">
             <i class="bi bi-check-lg conmplete-icon"></i>
             <h2 class="card-title">予約が完了しました。</h2>
+            <p>予約確認メールを送信しましたので、ご確認くださいませ。</p>
             <div class="d-grid gap-2  my-3">
                 <a class="btn btn-primary rounded-pill my-3" href="/">TOPに戻る</a>
             </div>
