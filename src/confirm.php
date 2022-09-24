@@ -50,9 +50,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 備考欄：{$comment}
                 ＝＝＝＝＝＝＝＝＝＝
 
-                sampleshop.jp
+                info@sampleshop.co.jp
                 ";
-    $headers = "From: from@sampleshop.jp";
+    $headers = "From: info@sampleshop.co.jp";
+    mail($to, $subject, $message, $headers);
+
+    //店舗管理者にメール送信
+    $to = ADMIN_MAIL;
+    $subject = "予約通知メール";
+    $message = "
+                以下の内容で予約を受け付けました。
+
+                ＝＝＝＝＝＝＝＝＝＝
+                予約日：{$reserve_date}
+                予約人数：{$reserve_num}人
+                予約時間：{$reserve_time}
+                氏名：{$name}様
+                備考欄：{$comment}
+                ＝＝＝＝＝＝＝＝＝＝
+
+                info@sampleshop.co.jp
+                ";
+    $headers = "From: info@sampleshop.co.jp";
     mail($to, $subject, $message, $headers);
 
     // 予約完了画面へ遷移
