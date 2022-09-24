@@ -38,3 +38,8 @@ services:
       - "4000:80"
     volumes:
       - ./docker/phpmyadmin/sessions:/sessions
+  mailhog:
+    image: mailhog/mailhog:latest
+    ports:
+      - "8025:8025"
+      - "1025:1025"
