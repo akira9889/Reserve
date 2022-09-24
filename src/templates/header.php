@@ -1,4 +1,4 @@
-<?php if ($thisdir == 'admin'): ?>
+<?php if (isset($thisdir) && $thisdir == 'admin'): ?>
     <header class="navbar">
         <div class="container-fluid">
             <div class="navbar-brand">SAMPLE SHOP</div>
