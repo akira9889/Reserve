@@ -9,6 +9,7 @@ $pdo = connect_db();
 $session_reserve = $_SESSION['RESERVE'];
 $reserve_date = $session_reserve['reserve_date'];
 $reserve_time = $session_reserve['reserve_time'];
+$reserve_date_time = $session_reserve['reserve_date_time'];
 $reserve_num = $session_reserve['reserve_num'];
 $name = $session_reserve['name'];
 $email = $session_reserve['email'];
@@ -18,10 +19,11 @@ $comment = $session_reserve['comment'];
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // セッション情報をreserveテーブルにINSERT
-    $sql = "INSERT INTO reserve(reserve_date, reserve_time, reserve_num, name, email, tel, comment) VALUES(:reserve_date, :reserve_time, :reserve_num, :name, :email, :tel, :comment)";
+    $sql = "INSERT INTO reserve(reserve_date, reserve_time, reserve_date_time, reserve_num, name, email, tel, comment) VALUES(:reserve_date, :reserve_time, :reserve_date_time, :reserve_num, :name, :email, :tel, :comment)";
     $stmt = $pdo->prepare($sql);
     $stmt->bindValue('reserve_date', $reserve_date, PDO::PARAM_STR);
     $stmt->bindValue('reserve_time', $reserve_time, PDO::PARAM_STR);
+    $stmt->bindValue('reserve_date_time', $reserve_date_time, PDO::PARAM_STR);
     $stmt->bindValue('reserve_num', (int)$reserve_num, PDO::PARAM_INT);
     $stmt->bindValue('name', $name, PDO::PARAM_STR);
     $stmt->bindValue('email', $email, PDO::PARAM_STR);
