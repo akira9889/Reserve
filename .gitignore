@@ -1,4 +1,4 @@
-.devcontainer/*
-src/.vscode/*
+.devcontainer
+.vscode
 docker/db/mysql_data
-.vscode/*
+doc
