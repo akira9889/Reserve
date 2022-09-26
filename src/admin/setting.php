@@ -110,21 +110,21 @@ $page_title = '予約設定';
         <div class="card-body container">
             <div class="mb-3">
                 <label for="exampleFormControlInput1" class="form-label">予約可能日</label>
-                <?= arrayToSelect('reservable_date', $reservable_date_array, $err['reservable_date'], $shop['reservable_date']) ?>
+                <?= arrayToSelect('reservable_date', $reservable_date_array, [$err['reservable_date']], $shop['reservable_date']) ?>
                 <div class="invalid-feedback"><?= $err['reservable_date'] ?></div>
             </div>
             <div class="mb-3">
                 <label for="exampleFormControlInput1" class="form-label">営業時間（予約可能時間）</label>
                 <div class="row">
                     <div class="col-5">
-                        <?= arrayToSelect('start_time', $start_time_array, $err['start_time'], $shop['start_time']) ?>
+                        <?= arrayToSelect('start_time', $start_time_array, [$err['start_time']], $shop['start_time']) ?>
                         <div class="invalid-feedback"><?= $err['start_time'] ?></div>
                     </div>
                     <div class="col-2 text-center pt-2">
                         <span>〜</span>
                     </div>
                     <div class="col-5">
-                        <?= arrayToSelect('end_time', $end_time_array, $err['end_time'],  $shop['end_time']) ?>
+                        <?= arrayToSelect('end_time', $end_time_array, [$err['end_time']],  $shop['end_time']) ?>
                         <div class="invalid-feedback"><?= $err['end_time'] ?></div>
                     </div>
                 </div>
@@ -132,7 +132,7 @@ $page_title = '予約設定';
             <div class="mb-4 row">
                 <div class="col-5">
                     <label for="exampleFormControlInput1" class="form-label">1時間あたりの予約上限人数</label>
-                    <?= arrayToSelect('max_reserve_num', $max_reserve_num_array, $err['max_reserve_num'], $shop['max_reserve_num']) ?>
+                    <?= arrayToSelect('max_reserve_num', $max_reserve_num_array, [$err['max_reserve_num']], $shop['max_reserve_num']) ?>
                     <div class="invalid-feedback"><?= $err['max_reserve_num'] ?></div>
                 </div>
             </div>
