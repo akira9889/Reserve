@@ -1,14 +1,16 @@
 <?php
-function arrayToSelect($inputName, $srcArray, $err, $selectedIndex = "")
+function arrayToSelect($inputName, $srcArray, $errs, $selectedVal = "")
 {
-    if (isset($err)) {
-        $temphtml = "<select class=\"form-select is-invalid\" name=\"{$inputName}\">" . PHP_EOL;
-    } else {
-        $temphtml = "<select class=\"form-select\" name=\"{$inputName}\">" . PHP_EOL;
+    foreach ($errs as $err) {
+        if (isset($err)) {
+            $temphtml = "<select id=\"{$inputName}\" class=\"form-select is-invalid\" name=\"{$inputName}\">" . PHP_EOL;
+        } else {
+            $temphtml = "<select id=\"{$inputName}\" class=\"form-select\" name=\"{$inputName}\">" . PHP_EOL;
+        }
     }
 
     foreach ($srcArray as $key => $val) {
-        if ($key == $selectedIndex) {
+        if ($key == $selectedVal) {
             $selectedText = "selected";
         } else {
             $selectedText = "";
@@ -64,4 +66,109 @@ function redirect($path)
     unset($pdo);
     header('Location:' . $path);
     exit;
+}
+
+function array_group_by(array $items, $keyName): array
+{
+    $group = [];
+
+    foreach ($items as $item) {
+        $key = $item[$keyName];
+        if (array_key_exists($key, $group)) {
+            $group[$key][] = $item;
+        } else {
+            $group[$key] = [$item];
+        }
+    }
+
+    return $group;
+}
+
+function getTotalReserveNumOfDate($date, $pdo) {
+//reserveテーブルから$dateの時間と時間ごとの予約合計人数を取得
+    $target_date = $date;
+
+    $sql = "SELECT DATE_FORMAT(reserve_date_time, '%Y-%m-%d %H:%i') AS date_time,reserve_num
+            FROM reserve
+            WHERE DATE_FORMAT(reserve_date, '%Y-%m-%d') = :reserve_date
+            ";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':reserve_date', $target_date, PDO::PARAM_STR);
+    $stmt->execute();
+
+    $reserve_list = $stmt->fetchAll();
+
+    $reserve_list = array_group_by($reserve_list,'date_time');
+
+    $total_reserve_num = 0;
+    foreach ($reserve_list as $date_time => $array) {
+        $total_reserve_num = array_sum(array_column($array, 'reserve_num'));
+        $reserve_list[$date_time] = $total_reserve_num;
+    }
+
+    return $reserve_list;
+}
+
+function createOption ($pdo) {
+    //shopテーブルから最大予約人数,営業時間を取得
+    $sql = "SELECT start_time, end_time, max_reserve_num from shop";
+    $stmt = $pdo->query($sql);
+    $shop = $stmt->fetch();
+
+    $start_time = $shop['start_time'];
+    $end_time = $shop['end_time'];
+    $max_reserve_num = $shop['max_reserve_num'];
+
+    //reserveテーブルから選択された時間と時間ごとの予約合計人数を取得
+    $reserve_list = getTotalReserveNumOfDate($_POST['date'], $pdo);
+
+    $reserve_time_array = [];
+
+    if (date('Y-m-d H:i:s', strtotime($start_time)) <= date('Y-m-d H:i:s', strtotime($end_time))) {
+        for (
+            $i = date('Y-m-d H:i:s', strtotime($start_time));
+            $i <= date('Y-m-d H:i:s', strtotime($end_time));
+            $i = date('Y-m-d H:i:s', strtotime($i . '+1 hours'))
+        ) {
+            $reserve_time_array[] = date('G:i', strtotime($i));
+        }
+    } else {
+        for (
+            $i = date('Y-m-d H:i:s', strtotime('00:00:00'));
+            $i <= date('Y-m-d H:i:s', strtotime($end_time));
+            $i = date('Y-m-d H:i:s', strtotime($i . '+1 hours'))
+        ) {
+            $reserve_time_array[] = date('H:i', strtotime($i));
+        }
+
+        for (
+            $i = date('Y-m-d H:i:s', strtotime($start_time));
+            $i <= date('Y-m-d H:i:s', strtotime('23:00:00'));
+            $i = date('Y-m-d H:i:s', strtotime($i . '+1 hours'))
+        ) {
+            $reserve_time_array[] = date('H:i', strtotime($i));
+        }
+    }
+
+    $reserve_time_array = array_combine($reserve_time_array, $reserve_time_array);
+
+//shopテーブルから最大予約人数とreserveテーブルから選択された日時の合計予約人数の差が0以下なら、その時間のoptionの生成だけを除外
+    foreach ($reserve_list as $date_time => $total_reserve_num) {
+        if ($max_reserve_num - $total_reserve_num <= 0) {
+            $key = date('H:i', strtotime($date_time));
+        }
+        unset($reserve_time_array[$key]);
+    }
+
+    $temphtml = '';
+    foreach ($reserve_time_array as $key => $selectedVal) {
+        if ($key == $selectedVal) {
+            $selectedText = "selected";
+        } else {
+            $selectedText = "";
+        }
+        $temphtml .= "<option value=\"{$key}\"{$selectedText}>{$selectedVal}</option>" . PHP_EOL;
+    }
+
+    echo $temphtml;
 }
