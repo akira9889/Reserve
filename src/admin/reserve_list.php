@@ -30,7 +30,7 @@ if ($target_yyyymm < date('Y-m')) {
 
 //データーベース接続
 $pdo = connect_db();
-//データベースから指定した予約リストを取得
+//データベースから指定した日時の予約リストを取得
 $sql = "SELECT * FROM reserve WHERE DATE_FORMAT(reserve_date, '%Y-%m') = :reserve_date ORDER BY reserve_date, reserve_time ASC";
 $stmt = $pdo->prepare($sql);
 $stmt->bindValue(':reserve_date', $target_yyyymm, PDO::PARAM_STR);
